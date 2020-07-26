@@ -18,15 +18,42 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Initialize the main project folder
-app.use(express.static('website'));
-
+app.use(express.static("website"));
 
 // Setup Server
 const port = 5000;
 app.listen(port, () => {
-  console.log(`Server is up and running on localhost:${port}`)
-})
+  console.log(`Server is up and running on localhost:${port}`);
+});
 
 app.get("/", (req, res) => {
   res.sendFile("index.html");
-})
+});
+
+app.get("/project-data", (req, res) => {
+  res.json({
+    success: true,
+    data: projectData,
+  });
+});
+app.post("/project-data", (req, res) => {
+  const { body } = req;
+  if (
+    !("temperature" in body) ||
+    !("date" in body) ||
+    !("userResponse" in body)
+  ) {
+    res.status(400).json({
+      success: false,
+      error: "temperature, date and userResponse expected in request body",
+    });
+  }
+
+  for (const prop in body) {
+    projectData[prop] = body[prop];
+  }
+  res.json({
+    success: true,
+    data: projectData,
+  });
+});
